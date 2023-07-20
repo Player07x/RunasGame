@@ -7,5 +7,5 @@ pancada_forte = {'Nome': 'Pancada', 'Dano': [3, 6], 'Tipo': 'concussão', 'Efeit
 espirro_acido = {'Nome': 'Espirro Ácido', 'Dano': [10, 20], 'Tipo': 'ácido', 'Efeitos': {}}
 
 # Armas
-espada_longa = {'Nome': 'Espada Longa', 'Dano': [6, 8], 'Tipo': 'cortante', 'Efeitos': {}}
+espada_longa = {'Nome': 'Espada Longa', 'Dano': [6, 12], 'Tipo': 'cortante', 'Efeitos': {}}
 adaga = {'Nome': 'Adaga', 'Dano': [3, 6], 'Tipo': 'perfurante', 'Efeitos': {}}

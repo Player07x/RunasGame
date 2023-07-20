@@ -14,7 +14,7 @@ class Menu:
     inimigos = []
 
     @staticmethod
-    def menuCombate(jogador: object, inim: list, companions=None):
+    def menuCombate(jogador: object, inim: list, companions: list = None):
         global turno, inimigos, choice
         inimigos = inim
         """
@@ -51,7 +51,7 @@ class Menu:
 
             # Verifica se a escolha de inimigo é válida
             if 0 < choice <= len(inimigos):
-                res = Menu.menuAtaque(inimigos[choice - 1])
+                res = Menu.menuAtaque(inimigos[choice - 1], companions)
                 if res == 'sucesso':
                     x = False
                     break
@@ -80,7 +80,7 @@ class Menu:
                 print('Opção Inválida! Escolha novamente.')
 
     @staticmethod
-    def menuAtaque(inimigo):
+    def menuAtaque(inimigo, companions):
         global escolha, choice
         x = True
         while x:
@@ -90,7 +90,10 @@ class Menu:
                     print('═' * 20 + f'╡ Turno {turno} ╞' + '═' * 20)
                     hud.Hud.verEfeitos(inimigo)
                     hud.Hud.lifeHud(inimigo, inimigo=True)
-                    choice = hud.Hud.hudChoice('Atacar', 'Usar Item', 'Magias', 'Fugir')
+                    if companions is None:
+                        choice = hud.Hud.hudChoice('Atacar', 'Usar Item', 'Magias', 'Fugir')
+                    else:
+                        choice = hud.Hud.hudChoice('Atacar', 'Usar Item', 'Magias', 'Fugir', 'Ver Aliados')
                     f = False
                 except ValueError:
                     print(Fore.RED + 'Não existe essa opção! Selecione outra.' + Fore.RESET)
@@ -106,6 +109,12 @@ class Menu:
                     escolha = Menu.fugir()
                     if escolha == 'sucesso':
                         return 'sucesso'
+                case 5:
+                    if companions is None:
+                        print('Opção Inválida! Escolha novamente.')
+                    else:
+                        ob.hud.escolhaAlvo(None, companions)
+                        escolha = 'voltar'
                 case _:
                     print('Opção Inválida! Escolha novamente.')
             x = False
@@ -210,8 +219,8 @@ class Menu:
             x += 1
             if x >= 4:
                 x = 1
-            res_inim = inimigo.atributos_s['des'] - randint(1, 20)
-            res_jog = ob.character.atributos_s['des'] - randint(1, 20)
+            res_inim = inimigo.atributos_s['des'] + inimigo.atributos_p['FISICO'] - randint(1, 20)
+            res_jog = ob.character.atributos_s['des'] + ob.character.atributos_p['FISICO'] - randint(1, 20)
             if res_inim > res_jog:
                 print(Fore.RED + 'Você não conseguiu.' + Fore.RESET)
                 resultado = 'fracasso'

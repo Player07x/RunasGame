@@ -16,10 +16,11 @@ class Monstro(char.Character):
         self.ataques = ataques
 
     @staticmethod
-    def randomAlvo(jogador, *alvos):
+    def randomAlvo(jogador, alvos: list):
         list_alvos = [jogador]
         for alvo in alvos:
-            list_alvos.append(alvo)
+            if alvo.status_atual['PV'] > 0:
+                list_alvos.append(alvo)
         alvo = choice(list_alvos)
         return alvo
 

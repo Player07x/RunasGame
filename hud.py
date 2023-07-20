@@ -133,16 +133,18 @@ class Hud:
         return ico_efeito
 
     @staticmethod
-    def escolhaAlvo(jogador, alvos, turno):
+    def escolhaAlvo(jogador, alvos, turno=None):
         global texto
         f = True
         while f:
             try:
-                print('═' * 20 + f'╡ Turno {turno} ╞' + '═' * 20)
+                if turno is not None:
+                    print('═' * 20 + f'╡ Turno {turno} ╞' + '═' * 20)
 
                 # Mostra a vida do jogador e os efeitos
-                ob.hud.verEfeitos(ob.character)
-                Hud.lifeHud(jogador)
+                if jogador is not None:
+                    ob.hud.verEfeitos(jogador)
+                    Hud.lifeHud(jogador)
 
                 # Laço de repetição da tela de seleção de inimigos
                 for num, alvo in enumerate(alvos):
@@ -179,5 +181,3 @@ class Hud:
                 return choice
             except ValueError:
                 print(Fore.RED + 'Não existe essa opção! Selecione outra.' + Fore.RESET)
-
-
