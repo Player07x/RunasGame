@@ -33,7 +33,7 @@ class Combate:
                         alvo.status_atual['PV'] -= dano
                 case 'concussão':
                     alvo.status_atual['PV'] -= dano
-            hud.Hud.msgDano(alvo.info["nome"], tipo)
+            hud.Hud.msgDano(alvo.info["nome"], dano, tipo)
         else:
             hud.Hud.msgDano(alvo.info["nome"], 0)
 

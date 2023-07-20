@@ -88,5 +88,28 @@ class Character:
             self.equipamento['armadura'] = armadura
 
     def setEfeito(self, *efeito):
+        # Para cada efeito nos EFEITOS
+        # ef é o efeito da lista
+        # ver_ef é o efeito do personagem
+        # self.efeitos é a lista de efeitos do personagem
+        # efeito é a lista de efeitos adicionada
         for ef in efeito:
-            self.efeitos.append(ef)
+            # Se o efeito estiver nos efeitos do personagem
+            if ef in self.efeitos:
+                pass
+            else:
+                if not self.efeitos:
+                    self.efeitos.append(ef)
+                # Para cada efeito do personagem
+                for ver_ef in self.efeitos:
+                    index = self.efeitos.index(ver_ef)
+                    # Se o efeito tiver o mesmo nome
+                    # e o mesmo nível
+                    if ef[0] == ver_ef[0] and ef[1][0] == ver_ef[1][0]:
+                        ef[2] = max(ef[2], ver_ef[2])
+                        self.efeitos[index] = ef
+                    elif ef[0] == ver_ef[0] and ef[1][0] != ver_ef[1][0]:
+                        ef[1][0] = max(ef[1][0], ver_ef[1][0])
+                        self.efeitos[index] = ef
+                    else:
+                        self.efeitos.append(ef)

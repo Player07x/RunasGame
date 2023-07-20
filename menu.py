@@ -1,9 +1,13 @@
+import copy
 import time
 from random import randint
-from colorama import Fore
+from colorama import Fore, init
 import combate
 import hud
 from lib import objetos as ob
+
+init(convert=False)
+
 
 
 class Menu:
@@ -11,7 +15,7 @@ class Menu:
     inimigos = []
 
     @staticmethod
-    def menuCombate(jogador: object, inim: list):
+    def menuCombate(jogador: object, inim: list, companions=None):
         global turno, inimigos, choice
         inimigos = inim
         """
@@ -63,7 +67,11 @@ class Menu:
                         inimigos.remove(inimigo)
                     # Se o inimigo estiver vivo, começa o turno de combate dele
                     else:
-                        inimigo.randomAtaque()
+                        if companions is not None:
+                            alvo = inimigo.randomAlvo(jogador, companions)
+                            inimigo.randomAtaque(alvo)
+                        else:
+                            inimigo.randomAtaque(jogador)
                         # Se o jogador morrer após o ataque, esse método se encerra
                         if jogador.status_atual['PV'] <= 0:
                             print(Fore.RED+'═' * 15 + f'╡ Você Morreu! ╞' + '═' * 15+Fore.RESET)
@@ -142,7 +150,7 @@ class Menu:
         while f:
             try:
                 x = True
-                magia = ob.character.equipamento['magias']
+                magia = copy.deepcopy(ob.character.equipamento['magias'])
                 while x:
                     choice = ob.hud.hudChoice(magia, voltar=True)
                     x = False
@@ -180,11 +188,14 @@ class Menu:
         f = True
         while f:
             try:
-                choice = ob.hud.hudChoice('Confirmar', voltar=True, texto=f'Nome: {magia["Nome"]}\n'
-                                                                 f'Tipo: {magia["Tipo"]}\n'
-                                                                 f'Custo: {magia["Custo"]} PE\n {Fore.GREEN}'
-                                                                 f'Seus PEs: {ob.character.status_atual["PE"]} '
-                                                                          f'{Fore.RESET}')
+                choice = ob.hud.hudChoice('Confirmar', voltar=True,
+                                          texto=f'Nome: {magia["Nome"]}\n'
+                                                f'Dano: {magia["Dano"][0]} - {magia["Dano"][1]}\n'
+                                                f'Tipo: {magia["Tipo"]}\n'
+                                                f'Custo: {magia["Custo"]} PE\n {Fore.GREEN}'
+                                                f'Seus PEs:'
+                                                f' {ob.character.status_atual["PE"]} '
+                                                f'{Fore.RESET}')
                 f = False
                 return choice[0]
             except ValueError:

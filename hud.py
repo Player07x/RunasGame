@@ -1,7 +1,9 @@
-from colorama import Fore
+from colorama import Fore, init
 from math import floor, ceil
 from time import sleep
 from lib import objetos as ob
+
+init(convert=False)
 
 
 class Hud:

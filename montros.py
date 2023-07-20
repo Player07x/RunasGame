@@ -15,14 +15,20 @@ class Monstro(char.Character):
     def setAtaques(self, ataques: list):
         self.ataques = ataques
 
-    def randomAtaque(self):
+    @staticmethod
+    def randomAlvo(jogador, *alvos):
+        alvo = choice(alvos)
+        return alvo
+
+    def randomAtaque(self, alvo):
         ataque = choice(self.ataques)
         if ataque['Tipo'] in ['cortante', 'perfurante', 'concussão']:
-            print(f'{ob.character.info["nome"]} foi alvo de um ataque de {ataque["Nome"]}.')
-            ob.combate.danoFisico(ob.character, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['for'])
+            print(f'{alvo.info["nome"]} foi alvo de um ataque de {ataque["Nome"]}.')
+            ob.combate.danoFisico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['for'])
         else:
-            print(f'{ob.character.info["nome"]} foi alvo de um ataque de {ataque["Nome"]}.')
-            ob.combate.danoMagico(ob.character, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['pod'])
+            print(f'{alvo.info["nome"]} foi alvo de um ataque de {ataque["Nome"]}.')
+            ob.combate.danoMagico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['pod'])
+
     def setXP(self):
         valor = 0
         multiplicador = 0
@@ -31,7 +37,7 @@ class Monstro(char.Character):
         for c in self.atributos_p:
             multiplicador += self.atributos_p[c]
 
-        self.xp = floor((valor * multiplicador)/100)
+        self.xp = floor(((valor * multiplicador)-200)/10)
 
     def setDescricao(self, desc):
         self.descricao = desc
