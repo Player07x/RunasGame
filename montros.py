@@ -17,7 +17,10 @@ class Monstro(char.Character):
 
     @staticmethod
     def randomAlvo(jogador, *alvos):
-        alvo = choice(alvos)
+        list_alvos = [jogador]
+        for alvo in alvos:
+            list_alvos.append(alvo)
+        alvo = choice(list_alvos)
         return alvo
 
     def randomAtaque(self, alvo):

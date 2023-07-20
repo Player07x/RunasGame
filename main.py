@@ -1,6 +1,6 @@
 import copy
 
-from lib import inimigos
+from lib import inimigos, companions
 from lib import objetos as ob
 from lib import ataques_e_armas as atk
 from lib import magias as mag
@@ -13,6 +13,6 @@ if __name__ == '__main__':
     ob.character.setEquipamento(arma=atk.adaga, magia=[mag.bola_de_fogo, mag.raio_de_fogo, mag.raio_eletrico])
     ob.character.setEfeito()
 
-    ob.menu.menuCombate(ob.character, [copy.deepcopy(inimigos.squonk)], [])
+    ob.menu.menuCombate(ob.character, [copy.deepcopy(inimigos.squonk)], companions.levi)
 
 
