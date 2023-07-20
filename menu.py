@@ -9,7 +9,6 @@ from lib import objetos as ob
 init(convert=False)
 
 
-
 class Menu:
     turno = 0
     inimigos = []
