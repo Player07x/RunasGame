@@ -1,5 +1,7 @@
 from math import floor
 
+from colorama import Fore
+
 import char
 from random import choice
 from lib import objetos as ob
@@ -24,13 +26,19 @@ class Monstro(char.Character):
         alvo = choice(list_alvos)
         return alvo
 
-    def randomAtaque(self, alvo):
+    def randomAtaque(self, alvo, aliado=False):
         ataque = choice(self.ataques)
+        cor = Fore.RED
+        if aliado is True:
+            cor = Fore.BLUE
+        msg = cor+f'{self.info["nome"]} atacou {alvo.info["nome"]} com um ataque de' \
+                              f' {ataque["Nome"]}.'+Fore.RESET
+
         if ataque['Tipo'] in ['cortante', 'perfurante', 'concussão']:
-            print(f'{alvo.info["nome"]} foi alvo de um ataque de {ataque["Nome"]}.')
+            print(msg)
             ob.combate.danoFisico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['for'])
         else:
-            print(f'{alvo.info["nome"]} foi alvo de um ataque de {ataque["Nome"]}.')
+            print(msg)
             ob.combate.danoMagico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['pod'])
 
     def setXP(self):

@@ -1,5 +1,6 @@
 import copy
 
+import NPC
 from lib import inimigos, companions
 from lib import objetos as ob
 from lib import ataques_e_armas as atk

@@ -103,9 +103,11 @@ class Hud:
     @staticmethod
     def msgDano(alvo_nome, dano, tipo=None):
         if tipo is not None:
-            print(f'{alvo_nome} sofreu {dano} de dano de {tipo}!')
+            print(f'{alvo_nome} sofreu {dano} de dano de {tipo}!\n')
+            sleep(0.1)
         else:
-            print(f'{alvo_nome} sofreu {dano} de dano!')
+            print(f'{alvo_nome} sofreu {dano} de dano!\n')
+            sleep(0.1)
 
     @staticmethod
     def verEfeitos(criatura):

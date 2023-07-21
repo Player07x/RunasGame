@@ -55,29 +55,47 @@ class Menu:
                 if res == 'sucesso':
                     x = False
                     break
-                # Cria uma cópia dos inimigos para evitar que dê erros
-                # no laço "for".
-                copy_inimigos = inimigos.copy()
-                for inimigo in copy_inimigos:
-                    # Se o inimigo morreu, remover da lista e pular turno de
-                    # combate dele
-                    if inimigo.status_atual['PV'] <= 0:
-                        print(inimigo.info['nome'], ' morreu!')
-                        inimigos.remove(inimigo)
-                    # Se o inimigo estiver vivo, começa o turno de combate dele
-                    else:
-                        if companions is not None:
-                            alvo = inimigo.randomAlvo(jogador, companions)
-                            inimigo.randomAtaque(alvo)
-                        else:
-                            inimigo.randomAtaque(jogador)
-                        # Se o jogador morrer após o ataque, esse método se encerra
-                        if jogador.status_atual['PV'] <= 0:
-                            print(Fore.RED+'═' * 15 + f'╡ Você Morreu! ╞' + '═' * 15+Fore.RESET)
-                            x = False
-                            break
+
+                Menu.turnoAliado(inimigos, companions)
+                Menu.turnoInimigo(jogador, inimigos, companions)
+
+                # Se o jogador morrer após o ataque, esse método se encerra
+                if jogador.status_atual['PV'] <= 0:
+                    print(Fore.RED+'═' * 15 + f'╡ Você Morreu! ╞' + '═' * 15+Fore.RESET)
+                    x = False
+                    break
             else:
                 print('Opção Inválida! Escolha novamente.')
+
+    @staticmethod
+    def turnoInimigo(alvos, atacantes, companion=None):
+        # Cria uma cópia dos inimigos para evitar que dê erros
+        # no laço "for".
+        copy_ias = atacantes.copy()
+        for ia in copy_ias:
+            # Se o inimigo morreu, remover da lista e pular turno de
+            # combate dele
+            if ia.status_atual['PV'] <= 0:
+                print(ia.info['nome'], ' morreu!')
+                atacantes.remove(ia)
+            # Se o inimigo estiver vivo, começa o turno de combate dele
+            else:
+                if companion is not None:
+                    alvo = ia.randomAlvo(alvos, companion)
+                    ia.randomAtaque(alvo)
+                else:
+                    ia.randomAtaque(alvos)
+
+    @staticmethod
+    def turnoAliado(alvos, atacantes):
+        copy_ias = atacantes.copy()
+        for ia in atacantes:
+            if ia.status_atual['PV'] <= 0:
+                print(ia.info['nome'], ' morreu!')
+                atacantes.remove(ia)
+            else:
+                alvo = ia.randomAlvoAli(alvos)
+                ia.randomAtaque(alvo, True)
 
     @staticmethod
     def menuAtaque(inimigo, companions):
@@ -113,7 +131,20 @@ class Menu:
                     if companions is None:
                         print('Opção Inválida! Escolha novamente.')
                     else:
-                        ob.hud.escolhaAlvo(None, companions)
+                        x = True
+                        while x:
+                            res = ob.hud.escolhaAlvo(None, companions)
+                            if len(companions) >= res > 0:
+                                print(
+                                    f'{companions[int(res-1)].info["nome"].upper()} | '
+                                    f'RDF: {companions[int(res-1)].status["RDF"]}, '
+                                    f'RDM: {companions[int(res-1)].status["RDM"]}')
+                                hud.Hud.verEfeitos(companions[int(res-1)])
+                                ob.hud.lifeHud(companions[int(res-1)])
+                                res = ob.hud.hudChoice('Menu de Ataque', voltar=True)
+                                if res[0] == 1:
+                                    x = False
+
                         escolha = 'voltar'
                 case _:
                     print('Opção Inválida! Escolha novamente.')
