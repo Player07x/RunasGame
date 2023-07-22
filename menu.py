@@ -1,6 +1,5 @@
 import copy
 import time
-from random import randint
 from colorama import Fore, init
 import combate
 import hud
@@ -34,12 +33,13 @@ class Menu:
         # Laço de repetição do combate
         while x:
             ob.combate.aplicarEfeitos(ob.character)
-            if jogador.status_atual['PV'] <= 0:
-                print(Fore.RED + '═' * 15 + f'╡ Você Morreu! ╞' + '═' * 15 + Fore.RESET)
+            situacao = Menu.verifMorte(jogador)
+            if situacao == 'morto':
                 x = False
                 break
             for inimigo in inimigos:
                 ob.combate.aplicarEfeitos(inimigo)
+            Menu.verifMorte(inimigos=inimigos)
             # Quebrar laço após todos os inimigos morrerem
             if len(inimigos) == 0:
                 break
@@ -60,42 +60,60 @@ class Menu:
                 Menu.turnoInimigo(jogador, inimigos, companions)
 
                 # Se o jogador morrer após o ataque, esse método se encerra
-                if jogador.status_atual['PV'] <= 0:
-                    print(Fore.RED+'═' * 15 + f'╡ Você Morreu! ╞' + '═' * 15+Fore.RESET)
+                situacao = Menu.verifMorte(jogador)
+                if situacao == 'morto':
                     x = False
                     break
             else:
                 print('Opção Inválida! Escolha novamente.')
 
     @staticmethod
-    def turnoInimigo(alvos, atacantes, companion=None):
-        # Cria uma cópia dos inimigos para evitar que dê erros
-        # no laço "for".
-        copy_ias = atacantes.copy()
-        for ia in copy_ias:
+    def verifMorte(jogador=None, inimigos=None, aliado=None):
+        jog = 'vivo'
+        if jogador is not None:
+            if jogador.status_atual['PV'] <= 0:
+                print(Fore.RED + '═' * 15 + f'╡ Você Morreu! ╞' + '═' * 15 + Fore.RESET)
+                jog = 'morto'
+        if inimigos is not None:
             # Se o inimigo morreu, remover da lista e pular turno de
             # combate dele
-            if ia.status_atual['PV'] <= 0:
-                print(ia.info['nome'], ' morreu!')
-                atacantes.remove(ia)
-            # Se o inimigo estiver vivo, começa o turno de combate dele
+            copy_ias = inimigos.copy()
+            for ia in copy_ias:
+                # Se o inimigo morreu, remover da lista e pular turno de
+                # combate dele
+                if ia.status_atual['PV'] <= 0:
+                    print(ia.info['nome'], ' morreu!')
+                    inimigos.remove(ia)
+        if aliado is not None:
+            copy_ias = aliado.copy()
+            for ia in copy_ias:
+                # Se o inimigo morreu, remover da lista e pular turno de
+                # combate dele
+                if ia.status_atual['PV'] <= 0 and ia.tipo == 'Importante':
+                    ia.setSituacao('Desmaiado')
+                elif ia.status_atual['PV'] <= 0:
+                    print(ia.info['nome'], ' morreu!')
+                    aliado.remove(ia)
+        return jog
+
+    @staticmethod
+    def turnoInimigo(alvos, atacantes, companion=None):
+        Menu.verifMorte(inimigos=atacantes)
+        for ia in atacantes:
+            if companion is not None:
+                alvo = ia.randomAlvo(alvos, companion)
+                ia.randomAtaque(alvo)
             else:
-                if companion is not None:
-                    alvo = ia.randomAlvo(alvos, companion)
-                    ia.randomAtaque(alvo)
-                else:
-                    ia.randomAtaque(alvos)
+                ia.randomAtaque(alvos)
 
     @staticmethod
     def turnoAliado(alvos, atacantes):
-        copy_ias = atacantes.copy()
-        for ia in atacantes:
-            if ia.status_atual['PV'] <= 0:
-                print(ia.info['nome'], ' morreu!')
-                atacantes.remove(ia)
-            else:
-                alvo = ia.randomAlvoAli(alvos)
-                ia.randomAtaque(alvo, True)
+        Menu.verifMorte(aliado=atacantes)
+        if atacantes is not None:
+            for ia in atacantes:
+                if ia.situacao == 'Vivo':
+                    alvo = ia.randomAlvoAli(alvos)
+                    ia.randomAtaque(alvo, True)
 
     @staticmethod
     def menuAtaque(inimigo, companions):
@@ -110,11 +128,14 @@ class Menu:
                     hud.Hud.lifeHud(inimigo, inimigo=True)
                     if companions is None:
                         choice = hud.Hud.hudChoice('Atacar', 'Usar Item', 'Magias', 'Fugir')
-                    else:
+                    elif len(companions) > 0:
                         choice = hud.Hud.hudChoice('Atacar', 'Usar Item', 'Magias', 'Fugir', 'Ver Aliados')
+                    else:
+                        companions = None
+                        choice = hud.Hud.hudChoice('Atacar', 'Usar Item', 'Magias', 'Fugir')
                     f = False
                 except ValueError:
-                    print(Fore.RED + 'Não existe essa opção! Selecione outra.' + Fore.RESET)
+                    hud.Hud.opcaoNaoExiste()
 
             match choice[0]:
                 case 1:
@@ -161,8 +182,7 @@ class Menu:
                 escolha = hud.Hud.hudChoice(arma['Nome'], 'Trocar de Armas', voltar=True)
                 match escolha[0]:
                     case 1:
-                        combate.Combate.danoFisico(inimigo, arma['Dano'], arma['Tipo'], arma['Efeitos'],
-                                                   dano_bonus=ob.character.atributos_s['for'])
+                        combate.Combate.atacar(arma, inimigo, ob.character)
                     case 2:
                         pass
 
@@ -170,7 +190,7 @@ class Menu:
                         return 'voltar'
                 f = False
             except ValueError:
-                print(Fore.RED+'Não existe essa opção! Selecione outra.'+Fore.RESET)
+                hud.Hud.opcaoNaoExiste()
 
     @staticmethod
     def verItens():
@@ -180,7 +200,7 @@ class Menu:
                 pass
                 f = False
             except ValueError:
-                print(Fore.RED+'Não existe essa opção! Selecione outra.'+Fore.RESET)
+                hud.Hud.opcaoNaoExiste()
 
     @staticmethod
     def verMagias(inimigo):
@@ -220,7 +240,7 @@ class Menu:
                         return 'voltar'
                     f = False
             except ValueError:
-                print(Fore.RED+'Não existe essa opção! Selecione outra.'+Fore.RESET)
+                hud.Hud.opcaoNaoExiste()
 
     @staticmethod
     def verInfoMagia(magia):
@@ -238,7 +258,7 @@ class Menu:
                 f = False
                 return choice[0]
             except ValueError:
-                print(Fore.RED+'Não existe essa opção! Selecione outra.'+Fore.RESET)
+                hud.Hud.opcaoNaoExiste()
 
     @staticmethod
     def fugir():
@@ -250,14 +270,12 @@ class Menu:
             x += 1
             if x >= 4:
                 x = 1
-            res_inim = inimigo.atributos_s['des'] + inimigo.atributos_p['FISICO'] - randint(1, 20)
-            res_jog = ob.character.atributos_s['des'] + ob.character.atributos_p['FISICO'] - randint(1, 20)
-            if res_inim > res_jog:
+            resultado = ob.combate.testeResistindo('FISICO', 'des', ob.character, inimigo)
+            if resultado[0] == 'fracasso':
                 print(Fore.RED + 'Você não conseguiu.' + Fore.RESET)
-                resultado = 'fracasso'
+                input()
                 break
-        if resultado is None:
+        else:
             print(Fore.GREEN + 'Você conseguiu!' + Fore.RESET)
-            resultado = 'sucesso'
 
-        return resultado
+        return resultado[0]

@@ -98,16 +98,16 @@ class Hud:
                         print()
                 x = False
             except ValueError:
-                print(Fore.RED+'Não existe essa opção! Selecione outra.'+Fore.RESET)
+                Hud.opcaoNaoExiste()
 
     @staticmethod
     def msgDano(alvo_nome, dano, tipo=None):
         if tipo is not None:
             print(f'{alvo_nome} sofreu {dano} de dano de {tipo}!\n')
-            sleep(0.1)
+            sleep(0.3)
         else:
             print(f'{alvo_nome} sofreu {dano} de dano!\n')
-            sleep(0.1)
+            sleep(0.3)
 
     @staticmethod
     def verEfeitos(criatura):
@@ -182,4 +182,9 @@ class Hud:
                 f = False
                 return choice
             except ValueError:
-                print(Fore.RED + 'Não existe essa opção! Selecione outra.' + Fore.RESET)
+                Hud.opcaoNaoExiste()
+
+    @staticmethod
+    def opcaoNaoExiste():
+        print(Fore.RED + 'Não existe essa opção! Selecione outra.' + Fore.RESET)
+

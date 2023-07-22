@@ -29,6 +29,7 @@ class Character:
         self.info = {'nome': 'Player'}
 
         self.equipamento = {'arma': None,
+                            'escudo': None,
                             'magias': {
                                 'slot1': None,
                                 'slot2': None,
@@ -70,9 +71,11 @@ class Character:
     def setInfo(self, nome):
         self.info['nome'] = nome
 
-    def setEquipamento(self, arma=None, magia=None, armadura=None):
+    def setEquipamento(self, arma=None, escudo=None, magia=None, armadura=None):
         if arma is not None:
             self.equipamento['arma'] = arma
+        if escudo is not None:
+            self.equipamento['escudo'] = escudo
         if magia is not None:
             for num, mag in enumerate(magia):
                 match num+1:

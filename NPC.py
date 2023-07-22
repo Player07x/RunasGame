@@ -32,5 +32,5 @@ class Npc(mon.Monstro):
         if len(inimigos) > 1:
             alvo = choice(inimigos)
         else:
-            alvo = inimigos
+            alvo = inimigos[0]
         return alvo

@@ -34,12 +34,8 @@ class Monstro(char.Character):
         msg = cor+f'{self.info["nome"]} atacou {alvo.info["nome"]} com um ataque de' \
                               f' {ataque["Nome"]}.'+Fore.RESET
 
-        if ataque['Tipo'] in ['cortante', 'perfurante', 'concussão']:
-            print(msg)
-            ob.combate.danoFisico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['for'])
-        else:
-            print(msg)
-            ob.combate.danoMagico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=self.atributos_s['pod'])
+        print(msg)
+        ob.combate.atacar(ataque, alvo, self)
 
     def setXP(self):
         valor = 0
