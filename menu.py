@@ -60,7 +60,7 @@ class Menu:
                 Menu.turnoInimigo(jogador, inimigos, companions)
 
                 # Se o jogador morrer após o ataque, esse método se encerra
-                situacao = Menu.verifMorte(jogador)
+                situacao = Menu.verifMorte(jogador, inimigos, companions)
                 if situacao == 'morto':
                     x = False
                     break

@@ -132,6 +132,8 @@ class Hud:
                     ico_efeito.append('🔥')
                 case 'eletrizar':
                     ico_efeito.append('⚡')
+                case 'sangramento':
+                    ico_efeito.append('🩸')
         return ico_efeito
 
     @staticmethod

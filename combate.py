@@ -20,7 +20,7 @@ class Combate:
                                                 texto='Como deseja se defender desse ataque?')
                         match res[0]:
                             case 1:
-                                resultado = Combate.testeHabilidade('FISICO', 'des', alvo, resultado[1])
+                                resultado = Combate.testeHabilidade('FISICO', 'des', alvo, resultado[1], defesa=True)
                                 Combate.esquiva(resultado, ataque, alvo, atacante)
                             case 2:
                                 Combate.bloqueio(alvo, alvo.equipamento['escudo'], ataque)
@@ -28,7 +28,7 @@ class Combate:
                     pass
                 if sem_escudo is True:
                     # Verifica se o oponente se defendeu do ataque
-                    resultado = Combate.testeHabilidade('FISICO', 'des', alvo, resultado[1])
+                    resultado = Combate.testeHabilidade('FISICO', 'des', alvo, resultado[1], defesa=True)
                     Combate.esquiva(resultado, ataque, alvo, atacante)
             else:
                 print(f'{atacante.info["nome"]} errou o ataque...\n')
@@ -38,7 +38,8 @@ class Combate:
     @staticmethod
     def esquiva(resultado, ataque, alvo, atacante):
         if resultado[0] == 'fracasso':
-            Combate.danoFisico(alvo, ataque['Dano'], ataque['Tipo'], dano_bonus=atacante.atributos_s['for'])
+            Combate.danoFisico(alvo, ataque['Dano'], ataque['Tipo'], ataque['Efeitos'], dano_bonus=atacante.atributos_s[
+                'for'])
         else:
             print(f'{alvo.info["nome"]} esquivou do ataque...\n')
 
@@ -65,8 +66,13 @@ class Combate:
             return 'fracasso', res_oponente, res_alvo
 
     @staticmethod
-    def testeHabilidade(atributo_p, atributo_s, alvo, bonus=0):
-        teste = alvo.atributos_s[atributo_s] + alvo.atributos_p[atributo_p] + bonus
+    def testeHabilidade(atributo_p, atributo_s, alvo, bonus=0, defesa=False):
+        if defesa is True:
+            teste = floor((alvo.atributos_s[atributo_s] + alvo.atributos_p[atributo_p])/2) + bonus
+
+        else:
+            teste = alvo.atributos_s[atributo_s] + alvo.atributos_p[atributo_p] + bonus
+
         resultado_teste = randint(1, 20)
         margem = resultado_teste - teste
         if teste >= resultado_teste:
@@ -87,6 +93,7 @@ class Combate:
 
     @staticmethod
     def danoFisico(alvo, dano: list, tipo: str, efeito=None, dano_bonus=0):
+        keep_life = alvo.status_atual['PV']
         if len(dano) > 1:
             dano = Combate.danoAleatorio(dano)
         dano += dano_bonus
@@ -106,6 +113,13 @@ class Combate:
             hud.Hud.msgDano(alvo.info["nome"], dano, tipo)
         else:
             hud.Hud.msgDano(alvo.info["nome"], 0)
+        if efeito is not None and efeito != []:
+            match efeito[0]:
+                case 'sangramento':
+                    if keep_life > alvo.status_atual['PV']:
+                        alvo.setEfeito(efeito)
+                case _:
+                    alvo.setEfeito(efeito)
 
     @staticmethod
     def danoMagico(alvo, dano: list, tipo: str, efeito=None, dano_bonus=0):
@@ -163,6 +177,9 @@ class Combate:
                             Combate.danoMagico(alvo, [efeito[1][0]], 'elétrico')
                             index = alvo.efeitos.index(efeito)
                             alvo.efeitos[index][2] = 0
+                    case 'sangramento':
+                        alvo.status_atual['PV'] -= efeito[1][0]
+                hud.Hud.msgDano(alvo.info['nome'], efeito[1][0], efeito[1][1])
                 dano = efeito[1][0] - alvo.status['RDM']
                 if dano < 0:
                     dano = 0

@@ -106,8 +106,7 @@ class Character:
                 # Para cada efeito do personagem
                 for ver_ef in self.efeitos:
                     index = self.efeitos.index(ver_ef)
-                    # Se o efeito tiver o mesmo nome
-                    # e o mesmo nível
+                    # Se o efeito tiver o mesmo nome e o mesmo nível
                     if ef[0] == ver_ef[0] and ef[1][0] == ver_ef[1][0]:
                         ef[2] = max(ef[2], ver_ef[2])
                         self.efeitos[index] = ef
